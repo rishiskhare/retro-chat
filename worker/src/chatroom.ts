@@ -7,7 +7,9 @@ const MAX_VIOLATIONS = 3;
 
 interface SocketState {
   messageLimiter: TokenBucket;
+  typingLimiter: TokenBucket;
   violations: number;
+  isTyping: boolean;
 }
 
 export class ChatRoom extends DurableObject {
@@ -20,7 +22,9 @@ export class ChatRoom extends DurableObject {
     this.ctx.acceptWebSocket(server);
     this.socketStates.set(server, {
       messageLimiter: new TokenBucket(5, 1), // 5 burst, 1/s sustained
+      typingLimiter: new TokenBucket(1, 1),  // 1 per second
       violations: 0,
+      isTyping: false,
     });
 
     // If both users are connected, notify that they're matched
@@ -78,17 +82,31 @@ export class ChatRoom extends DurableObject {
         }
 
         const sanitized = escapeHtml(text);
+        // Implicitly clear typing state when a message is sent
+        if (state.isTyping) {
+          state.isTyping = false;
+          sendMessage(partner, { type: "stranger-stop-typing" });
+        }
         sendMessage(partner, { type: "message", text: sanitized, ts: Date.now() });
         break;
       }
 
       case "typing": {
-        if (partner) sendMessage(partner, { type: "stranger-typing" });
+        if (partner && !state.isTyping) {
+          // Only forward the first typing event; throttle subsequent ones
+          if (state.typingLimiter.consume()) {
+            state.isTyping = true;
+            sendMessage(partner, { type: "stranger-typing" });
+          }
+        }
         break;
       }
 
       case "stop-typing": {
-        if (partner) sendMessage(partner, { type: "stranger-stop-typing" });
+        if (partner && state.isTyping) {
+          state.isTyping = false;
+          sendMessage(partner, { type: "stranger-stop-typing" });
+        }
         break;
       }
 

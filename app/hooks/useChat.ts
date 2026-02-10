@@ -21,6 +21,7 @@ export function useChat() {
   const [rateLimited, setRateLimited] = useState(false);
   const [waitingPosition, setWaitingPosition] = useState(0);
   const rateLimitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingSafetyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const msgIdCounter = useRef(0);
   const pendingRoomId = useRef<string | null>(null);
   const { play } = useSound();
@@ -50,9 +51,6 @@ export function useChat() {
         }
 
         case "message":
-          // Determine if this is our own message or stranger's
-          // The server echoes our messages back, but we track sent messages locally
-          // So server messages are always from stranger
           addMessage({
             id: nextId(),
             sender: "stranger",
@@ -61,14 +59,27 @@ export function useChat() {
           });
           play("message");
           setStrangerTyping(false);
+          if (typingSafetyTimer.current) {
+            clearTimeout(typingSafetyTimer.current);
+            typingSafetyTimer.current = null;
+          }
           break;
 
         case "stranger-typing":
           setStrangerTyping(true);
+          // Safety timeout: auto-clear after 5s in case stop-typing is lost
+          if (typingSafetyTimer.current) clearTimeout(typingSafetyTimer.current);
+          typingSafetyTimer.current = setTimeout(() => {
+            setStrangerTyping(false);
+          }, 5000);
           break;
 
         case "stranger-stop-typing":
           setStrangerTyping(false);
+          if (typingSafetyTimer.current) {
+            clearTimeout(typingSafetyTimer.current);
+            typingSafetyTimer.current = null;
+          }
           break;
 
         case "stranger-disconnected":
