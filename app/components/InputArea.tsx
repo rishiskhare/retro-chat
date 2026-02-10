@@ -45,10 +45,10 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
   };
 
   return (
-    <div style={{ display: "flex", gap: "4px", padding: "4px" }}>
+    <div style={{ display: "flex", gap: "4px", padding: "4px", flexShrink: 0 }}>
       <textarea
         className="chat-input"
-        style={{ flex: 1, height: "48px" }}
+        style={{ flex: 1, height: "44px", minWidth: 0 }}
         value={text}
         onChange={(e) => {
           setText(e.target.value);
@@ -58,17 +58,27 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
         disabled={disabled}
         placeholder={disabled ? "Chat ended" : "Type a message..."}
         maxLength={500}
+        autoComplete="off"
+        autoCorrect="on"
       />
       <button
         className="button"
         onClick={handleSend}
         disabled={disabled || !text.trim()}
-        style={{ alignSelf: "flex-end", height: "48px", padding: "0 16px" }}
+        style={{
+          alignSelf: "stretch",
+          padding: "0 16px",
+          minHeight: "44px",
+          flexShrink: 0,
+        }}
       >
         Send
       </button>
       {rateLimited && (
-        <span className="rate-limit-warning" style={{ alignSelf: "center" }}>
+        <span
+          className="rate-limit-warning"
+          style={{ alignSelf: "center", flexShrink: 0 }}
+        >
           Slow down!
         </span>
       )}

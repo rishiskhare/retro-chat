@@ -41,12 +41,20 @@ export function ChatWindow() {
 
   const handleDisconnect = useCallback(() => {
     disconnectChat();
-    // Navigate back to landing
     window.location.href = "/";
   }, [disconnectChat]);
 
   return (
-    <div className="window" style={{ width: "100%", maxWidth: "600px", height: "500px", display: "flex", flexDirection: "column" }}>
+    <div
+      className="window"
+      style={{
+        width: "100%",
+        maxWidth: "600px",
+        height: "min(500px, 100%)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div className="title-bar">
         <div className="title-bar-text">RetroChat - Instant Message</div>
         <div className="title-bar-controls">
@@ -55,7 +63,18 @@ export function ChatWindow() {
           <button aria-label="Close" onClick={handleDisconnect} />
         </div>
       </div>
-      <div className="window-body" style={{ display: "flex", flexDirection: "column", flex: 1, margin: 0, padding: "4px", overflow: "hidden" }}>
+      <div
+        className="window-body"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          margin: 0,
+          padding: "4px",
+          overflow: "hidden",
+          minHeight: 0,
+        }}
+      >
         {chatState === "waiting" ? (
           <WaitingScreen position={waitingPosition} onCancel={handleDisconnect} />
         ) : (

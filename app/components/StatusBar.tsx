@@ -23,23 +23,36 @@ export function StatusBar({
   if (connectionState === "connecting" || connectionState === "reconnecting") {
     statusText = "Connecting...";
   } else if (chatState === "chatting") {
-    statusText = strangerTyping ? "Stranger is typing..." : "Connected to stranger";
+    statusText = strangerTyping ? "Stranger is typing..." : "Connected";
   } else if (chatState === "stranger-left") {
-    statusText = "Stranger has disconnected";
+    statusText = "Stranger disconnected";
   } else if (chatState === "waiting") {
-    statusText = "Looking for someone to chat with...";
+    statusText = "Searching...";
   } else {
     statusText = "Ready";
   }
 
   return (
-    <div className="status-bar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 8px", borderTop: "1px solid #808080", background: "#ece9d8" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <div
+      className="status-bar"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "4px 8px",
+        borderTop: "1px solid #808080",
+        background: "#ece9d8",
+        gap: "8px",
+        flexWrap: "wrap",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
         <span
           style={{
             width: "8px",
             height: "8px",
             borderRadius: "50%",
+            flexShrink: 0,
             background:
               connectionState === "connected"
                 ? "#00aa00"
@@ -49,20 +62,28 @@ export function StatusBar({
             display: "inline-block",
           }}
         />
-        <span>{statusText}</span>
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {statusText}
+        </span>
       </div>
-      <div style={{ display: "flex", gap: "4px" }}>
-        {(chatState === "chatting" || chatState === "stranger-left") && (
-          <>
-            <button className="button" onClick={onNewChat} style={{ fontSize: "11px", padding: "2px 8px" }}>
-              New Chat
-            </button>
-            <button className="button" onClick={onDisconnect} style={{ fontSize: "11px", padding: "2px 8px" }}>
-              Disconnect
-            </button>
-          </>
-        )}
-      </div>
+      {(chatState === "chatting" || chatState === "stranger-left") && (
+        <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
+          <button
+            className="button"
+            onClick={onNewChat}
+            style={{ fontSize: "11px", padding: "4px 10px", minHeight: "28px" }}
+          >
+            New Chat
+          </button>
+          <button
+            className="button"
+            onClick={onDisconnect}
+            style={{ fontSize: "11px", padding: "4px 10px", minHeight: "28px" }}
+          >
+            Disconnect
+          </button>
+        </div>
+      )}
     </div>
   );
 }
