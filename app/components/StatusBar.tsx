@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import type { ChatState } from "@/app/hooks/useChat";
 import type { ConnectionState } from "@/app/lib/ws";
 
@@ -18,6 +19,39 @@ export function StatusBar({
   onNewChat,
   onDisconnect,
 }: StatusBarProps) {
+  const [confirming, setConfirming] = useState(false);
+
+  // Reset confirmation state when chat state changes
+  useEffect(() => {
+    setConfirming(false);
+  }, [chatState]);
+
+  const handleStop = useCallback(() => {
+    if (confirming) {
+      // Second click — skip to new chat (rejoin queue)
+      setConfirming(false);
+      onNewChat();
+    } else {
+      // First click — ask "Really?"
+      setConfirming(true);
+    }
+  }, [confirming, onNewChat]);
+
+  // Esc keyboard shortcut
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (chatState === "stranger-left") {
+          onNewChat();
+        } else if (chatState === "chatting") {
+          handleStop();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [chatState, handleStop, onNewChat]);
+
   let statusText = "";
 
   if (connectionState === "connecting" || connectionState === "reconnecting") {
@@ -39,7 +73,7 @@ export function StatusBar({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "4px 8px",
+        padding: "6px 10px",
         borderTop: "1px solid #808080",
         background: "#ece9d8",
         gap: "8px",
@@ -49,8 +83,8 @@ export function StatusBar({
       <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
         <span
           style={{
-            width: "8px",
-            height: "8px",
+            width: "10px",
+            height: "10px",
             borderRadius: "50%",
             flexShrink: 0,
             background:
@@ -66,23 +100,23 @@ export function StatusBar({
           {statusText}
         </span>
       </div>
-      {(chatState === "chatting" || chatState === "stranger-left") && (
-        <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
-          <button
-            className="button"
-            onClick={onNewChat}
-            style={{ fontSize: "11px", padding: "4px 10px", minHeight: "28px" }}
-          >
-            New Chat
-          </button>
-          <button
-            className="button"
-            onClick={onDisconnect}
-            style={{ fontSize: "11px", padding: "4px 10px", minHeight: "28px" }}
-          >
-            Disconnect
-          </button>
-        </div>
+      {chatState === "chatting" && (
+        <button
+          className="button"
+          onClick={handleStop}
+          style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
+        >
+          {confirming ? "Really?" : "Stop (esc)"}
+        </button>
+      )}
+      {chatState === "stranger-left" && (
+        <button
+          className="button"
+          onClick={onNewChat}
+          style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
+        >
+          New Chat (esc)
+        </button>
       )}
     </div>
   );

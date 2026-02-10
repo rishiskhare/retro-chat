@@ -67,9 +67,10 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
         disabled={disabled || !text.trim()}
         style={{
           alignSelf: "stretch",
-          padding: "0 16px",
+          padding: "0 20px",
           minHeight: "44px",
           flexShrink: 0,
+          fontSize: "14px",
         }}
       >
         Send
