@@ -20,7 +20,7 @@ export default function Home() {
           </div>
           <div className="modern-welcome-body">
             <div style={{ fontSize: "48px", marginBottom: "8px" }}>💬</div>
-            <h1 className="modern-welcome-title">RetroChat</h1>
+            <h1 className="modern-welcome-title">LuckyChat</h1>
             <p className="modern-welcome-subtitle">Talk to random strangers!</p>
             <p className="modern-welcome-desc">Anonymous. Instant. Fun.</p>
 
@@ -57,7 +57,7 @@ export default function Home() {
     >
       <div className="window" style={{ width: "100%", maxWidth: "420px" }}>
         <div className="title-bar">
-          <div className="title-bar-text">Welcome to RetroChat</div>
+          <div className="title-bar-text">Welcome to LuckyChat</div>
           <div className="title-bar-controls">
             <button aria-label="Minimize" />
             <button aria-label="Maximize" />
@@ -67,7 +67,7 @@ export default function Home() {
         <div className="window-body" style={{ padding: "24px", textAlign: "center" }}>
           <div style={{ fontSize: "48px", marginBottom: "8px" }}>💬</div>
           <h1 style={{ fontSize: "22px", fontWeight: "bold", color: "#7B0099", margin: "0 0 8px 0" }}>
-            RetroChat
+            LuckyChat
           </h1>
           <p style={{ fontSize: "14px", color: "#333", margin: "0 0 4px 0" }}>
             Talk to random strangers!

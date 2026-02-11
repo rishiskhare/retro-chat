@@ -3,7 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/app/context/ThemeContext";
 
 export const metadata: Metadata = {
-  title: "RetroChat - Talk to Strangers",
+  title: "LuckyChat - Talk to Strangers",
   description: "Chat with random strangers in retro style. Inspired by Yahoo Messenger and AOL Instant Messenger.",
 };
 

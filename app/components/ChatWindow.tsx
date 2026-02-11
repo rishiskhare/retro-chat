@@ -51,7 +51,7 @@ export function ChatWindow() {
     return (
       <div className="modern-chat-container">
         <div className="modern-header">
-          <span className="modern-header-title">RetroChat</span>
+          <span className="modern-header-title">LuckyChat</span>
           <ThemeToggle />
         </div>
         <div className="modern-chat-body">
@@ -93,7 +93,7 @@ export function ChatWindow() {
       }}
     >
       <div className="title-bar">
-        <div className="title-bar-text">RetroChat - Instant Message</div>
+        <div className="title-bar-text">LuckyChat - Instant Message</div>
         <div className="title-bar-controls">
           <button aria-label="Minimize" />
           <button aria-label="Maximize" />

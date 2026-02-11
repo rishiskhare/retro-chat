@@ -11,16 +11,18 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    // Origin validation
+    const origin = request.headers.get("Origin") || "";
+    const allowedOrigins = env.ALLOWED_ORIGIN.split(",").map((o) => o.trim());
+    const matchedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+
     // CORS preflight
     if (request.method === "OPTIONS") {
       return new Response(null, {
-        headers: corsHeaders(env.ALLOWED_ORIGIN),
+        headers: corsHeaders(matchedOrigin),
       });
     }
 
-    // Origin validation for WebSocket upgrades
-    const origin = request.headers.get("Origin") || "";
-    const allowedOrigins = env.ALLOWED_ORIGIN.split(",").map((o) => o.trim());
     if (origin && !allowedOrigins.includes(origin)) {
       return new Response("Forbidden origin", { status: 403 });
     }

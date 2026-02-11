@@ -1,4 +1,4 @@
-name = "retro-chat-worker"
+name = "lucky-chat-worker"
 main = "src/index.ts"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
@@ -16,4 +16,4 @@ tag = "v1"
 new_sqlite_classes = ["Matchmaker", "ChatRoom"]
 
 [vars]
-ALLOWED_ORIGIN = "http://localhost:3000"
+ALLOWED_ORIGIN = "http://localhost:3000,https://luckychat.vercel.app"
