@@ -569,7 +569,9 @@ html, body {
   border-radius: 18px;
   font-size: 16px;
   line-height: 20px;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
   position: relative;
   margin-bottom: 12px;
 }
