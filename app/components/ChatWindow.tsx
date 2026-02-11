@@ -93,7 +93,7 @@ export function ChatWindow() {
       }}
     >
       <div className="title-bar">
-        <div className="title-bar-text">LuckyChat - Instant Message</div>
+        <a href="/" className="title-bar-text" style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}>LuckyChat - Instant Message</a>
         <div className="title-bar-controls">
           <button aria-label="Close" onClick={handleDisconnect} />
         </div>
