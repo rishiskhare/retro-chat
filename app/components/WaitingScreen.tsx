@@ -12,13 +12,6 @@ export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
   const { theme } = useTheme();
   const onlineCount = useOnlineCount();
 
-  const onlineIndicator = onlineCount !== null ? (
-    <div style={{ fontSize: "13px", color: theme === "modern" ? "#636366" : "#666", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "4px" }}>
-      <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
-      {onlineCount} {onlineCount === 1 ? "user" : "users"} online
-    </div>
-  ) : null;
-
   if (theme === "modern") {
     return (
       <div className="modern-waiting">
@@ -33,8 +26,13 @@ export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
             Position in queue: {position}
           </div>
         )}
-        {onlineIndicator}
-        <button className="modern-btn-secondary" onClick={onCancel} style={{ marginTop: "8px" }}>
+        {onlineCount !== null && (
+          <div className="modern-waiting-position" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
+            {onlineCount} online
+          </div>
+        )}
+        <button className="modern-btn-secondary" onClick={onCancel}>
           Cancel
         </button>
       </div>
@@ -42,8 +40,8 @@ export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: "32px", gap: "16px" }}>
-      <div style={{ fontSize: "32px" }} className="hourglass-spin">
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: "32px", gap: "8px" }}>
+      <div style={{ fontSize: "32px", marginBottom: "4px" }} className="hourglass-spin">
         &#9203;
       </div>
       <div style={{ fontSize: "16px", fontWeight: "bold", color: "#333" }}>
@@ -54,8 +52,13 @@ export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
           Position in queue: {position}
         </div>
       )}
-      {onlineIndicator}
-      <button className="button" onClick={onCancel} style={{ marginTop: "8px" }}>
+      {onlineCount !== null && (
+        <div style={{ fontSize: "13px", color: "#666", display: "flex", alignItems: "center", gap: "5px" }}>
+          <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
+          {onlineCount} online
+        </div>
+      )}
+      <button className="button" onClick={onCancel} style={{ marginTop: "4px" }}>
         Cancel
       </button>
     </div>

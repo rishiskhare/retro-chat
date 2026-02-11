@@ -798,7 +798,7 @@ html, body {
   justify-content: center;
   flex: 1;
   padding: 32px;
-  gap: 16px;
+  gap: 12px;
 }
 
 .modern-waiting-text {
