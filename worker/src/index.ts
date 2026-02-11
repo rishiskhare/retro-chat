@@ -1,3 +1,5 @@
+import { createChallenge } from "altcha-lib";
+
 export { Matchmaker } from "./matchmaker";
 export { ChatRoom } from "./chatroom";
 
@@ -5,6 +7,7 @@ interface Env {
   MATCHMAKER: DurableObjectNamespace;
   CHATROOM: DurableObjectNamespace;
   ALLOWED_ORIGIN: string;
+  ALTCHA_HMAC_KEY: string;
 }
 
 export default {
@@ -34,6 +37,16 @@ export default {
       const stats = await matchmaker.fetch(new Request("http://do/stats"));
       const data = await stats.json();
       return Response.json(data, { headers: corsHeaders(matchedOrigin) });
+    }
+
+    // REST route: /api/altcha-challenge
+    if (url.pathname === "/api/altcha-challenge" && request.method === "GET") {
+      const challenge = await createChallenge({
+        hmacKey: env.ALTCHA_HMAC_KEY,
+        maxNumber: 50000,
+        expires: new Date(Date.now() + 5 * 60 * 1000), // 5 min expiry
+      });
+      return Response.json(challenge, { headers: corsHeaders(matchedOrigin) });
     }
 
     // WebSocket routes

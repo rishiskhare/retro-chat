@@ -865,3 +865,25 @@ html, body {
     align-items: stretch !important;
   }
 }
+
+/* ===== ALTCHA & VERIFICATION HINT ===== */
+altcha-widget[floating] {
+  display: block;
+  height: 0;
+  overflow: visible;
+}
+
+.verification-hint {
+  margin: 8px 0 0 0;
+  font-size: 12px;
+  text-align: center;
+}
+
+[data-theme="modern"] .verification-hint {
+  color: #636366;
+}
+
+[data-theme="retro"] .verification-hint {
+  color: #666;
+}
+

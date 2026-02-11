@@ -1,19 +1,34 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/context/ThemeContext";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 import { useOnlineCount } from "@/app/hooks/useOnlineCount";
 
+const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8787";
+const API_BASE_URL = WS_BASE_URL.replace(/^ws/, "http");
+const CHALLENGE_URL = `${API_BASE_URL}/api/altcha-challenge`;
+
 export default function Home() {
   const { theme } = useTheme();
   const router = useRouter();
   const onlineCount = useOnlineCount();
+  const altchaImported = useRef(false);
 
-  const handleStart = useCallback(() => {
-    router.push("/chat");
-  }, [router]);
+  useEffect(() => {
+    if (altchaImported.current) return;
+    altchaImported.current = true;
+    import("altcha").catch(() => {});
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      router.push("/chat");
+    },
+    [router]
+  );
 
   if (theme === "modern") {
     return (
@@ -36,9 +51,21 @@ export default function Home() {
               </p>
             </div>
 
-            <button className="modern-btn-primary" onClick={handleStart}>
-              Start Chatting
-            </button>
+            <form onSubmit={handleSubmit}>
+              <altcha-widget
+                challengeurl={CHALLENGE_URL}
+                floating="bottom"
+                auto="onsubmit"
+                hidefooter
+                floatinganchor=".modern-start-btn"
+              />
+              <button className="modern-btn-primary modern-start-btn" type="submit">
+                Start Chatting
+              </button>
+              <p className="verification-hint">
+                <span style={{ fontSize: "12px" }}>🔒</span> Quick verification required to start
+              </p>
+            </form>
 
             {onlineCount !== null && (
               <div style={{ marginTop: "12px", fontSize: "14px", color: "#636366", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
@@ -86,19 +113,31 @@ export default function Home() {
             </p>
           </div>
 
-          <button
-            className="button"
-            onClick={handleStart}
-            style={{
-              fontSize: "16px",
-              padding: "12px 40px",
-              fontWeight: "bold",
-              cursor: "pointer",
-              minHeight: "44px",
-            }}
-          >
-            Start Chatting
-          </button>
+          <form onSubmit={handleSubmit}>
+            <altcha-widget
+              challengeurl={CHALLENGE_URL}
+              floating="bottom"
+              auto="onsubmit"
+              hidefooter
+              floatinganchor=".retro-start-btn"
+            />
+            <button
+              className="button retro-start-btn"
+              type="submit"
+              style={{
+                fontSize: "16px",
+                padding: "12px 40px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                minHeight: "44px",
+              }}
+            >
+              Start Chatting
+            </button>
+            <p className="verification-hint">
+              <span style={{ fontSize: "12px" }}>🔒</span> Quick verification required to start
+            </p>
+          </form>
 
           {onlineCount !== null && (
             <div style={{ marginTop: "12px", fontSize: "14px", color: "#666", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
