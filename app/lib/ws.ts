@@ -8,12 +8,14 @@ export type StateChangeHandler = (state: ConnectionState) => void;
 const HEARTBEAT_INTERVAL = 10_000; // 10s – stay under Cloudflare DO ~15s hibernation timeout
 const MAX_BACKOFF = 30_000; // 30s cap
 const INITIAL_BACKOFF = 1_000; // 1s
+const PONG_TIMEOUT = 3_000; // 3s to receive pong after visibility-triggered ping
 
 export class WebSocketManager {
   private ws: WebSocket | null = null;
   private url: string;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private pongTimer: ReturnType<typeof setTimeout> | null = null;
   private backoff = INITIAL_BACKOFF;
   private onMessage: MessageHandler;
   private onStateChange: StateChangeHandler;
@@ -21,6 +23,8 @@ export class WebSocketManager {
   private state: ConnectionState = "disconnected";
   private intentionalClose = false;
   private autoReconnect: boolean;
+  private awaitingPong = false;
+  private visibilityHandler: (() => void) | null = null;
 
   constructor(
     url: string,
@@ -60,7 +64,18 @@ export class WebSocketManager {
     this.ws.onmessage = (event) => {
       if (typeof event.data !== "string") return;
       const msg = parseServerMessage(event.data);
-      if (msg) this.onMessage(msg);
+      if (!msg) return;
+
+      // Clear liveness check on pong
+      if (msg.type === "pong") {
+        this.awaitingPong = false;
+        if (this.pongTimer) {
+          clearTimeout(this.pongTimer);
+          this.pongTimer = null;
+        }
+      }
+
+      this.onMessage(msg);
     };
 
     this.ws.onclose = (event) => {
@@ -113,6 +128,7 @@ export class WebSocketManager {
     this.heartbeatTimer = setInterval(() => {
       this.send({ type: "ping" });
     }, HEARTBEAT_INTERVAL);
+    this.startVisibilityCheck();
   }
 
   private stopHeartbeat(): void {
@@ -120,6 +136,49 @@ export class WebSocketManager {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
+    this.stopVisibilityCheck();
+  }
+
+  /** When the tab becomes visible again, verify the connection is still alive. */
+  private startVisibilityCheck(): void {
+    this.stopVisibilityCheck();
+    this.visibilityHandler = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+
+      // Send a ping and require a pong within the deadline
+      this.awaitingPong = true;
+      this.send({ type: "ping" });
+      this.pongTimer = setTimeout(() => {
+        if (!this.awaitingPong) return;
+        // No pong received — connection is stale, force close
+        this.pongTimer = null;
+        if (this.ws) {
+          this.ws.close(4000, "pong-timeout");
+        }
+      }, PONG_TIMEOUT);
+
+      // Restart the heartbeat interval since timers may have drifted
+      if (this.heartbeatTimer) {
+        clearInterval(this.heartbeatTimer);
+      }
+      this.heartbeatTimer = setInterval(() => {
+        this.send({ type: "ping" });
+      }, HEARTBEAT_INTERVAL);
+    };
+    document.addEventListener("visibilitychange", this.visibilityHandler);
+  }
+
+  private stopVisibilityCheck(): void {
+    if (this.visibilityHandler) {
+      document.removeEventListener("visibilitychange", this.visibilityHandler);
+      this.visibilityHandler = null;
+    }
+    if (this.pongTimer) {
+      clearTimeout(this.pongTimer);
+      this.pongTimer = null;
+    }
+    this.awaitingPong = false;
   }
 
   private scheduleReconnect(): void {

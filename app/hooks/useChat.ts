@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useWebSocket } from "./useWebSocket";
 import { useSound } from "./useSound";
 import type { ServerMessage } from "@/app/lib/protocol";
@@ -133,6 +133,22 @@ export function useChat() {
     send,
     disconnect,
   } = useWebSocket(handleServerMessage);
+
+  // Detect connection loss during an active chat (e.g. stale socket after tab background)
+  useEffect(() => {
+    if (connectionState === "disconnected" && chatStateRef.current === "chatting") {
+      chatStateRef.current = "stranger-left";
+      setChatState("stranger-left");
+      setStrangerTyping(false);
+      addMessage({
+        id: nextId(),
+        sender: "system",
+        text: "Connection lost. Please start a new chat.",
+        ts: Date.now(),
+      });
+      play("door-close");
+    }
+  }, [connectionState, addMessage, play]);
 
   const joinQueue = useCallback(() => {
     setMessages([]);
