@@ -5,7 +5,7 @@ export type ConnectionState = "connecting" | "connected" | "disconnected" | "rec
 export type MessageHandler = (msg: ServerMessage) => void;
 export type StateChangeHandler = (state: ConnectionState) => void;
 
-const HEARTBEAT_INTERVAL = 30_000; // 30s
+const HEARTBEAT_INTERVAL = 10_000; // 10s – stay under Cloudflare DO ~15s hibernation timeout
 const MAX_BACKOFF = 30_000; // 30s cap
 const INITIAL_BACKOFF = 1_000; // 1s
 
