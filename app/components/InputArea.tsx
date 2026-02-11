@@ -128,7 +128,7 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
           padding: "0 20px",
           minHeight: "44px",
           flexShrink: 0,
-          fontSize: "14px",
+          fontSize: "15px",
         }}
       >
         Send

@@ -31,7 +31,7 @@ export function MessageBubble({ message, isLastInGroup = true }: MessageBubblePr
   const label = message.sender === "you" ? "You" : "Stranger";
 
   return (
-    <div style={{ padding: "2px 8px", wordBreak: "break-word" }}>
+    <div style={{ padding: "1px 8px", wordBreak: "break-word", fontSize: "16px" }}>
       <span className={senderClass}>{label}:</span>{" "}
       <span>{message.text}</span>
     </div>

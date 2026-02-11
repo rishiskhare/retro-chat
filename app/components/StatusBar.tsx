@@ -139,7 +139,7 @@ export function StatusBar({
           <button
             className="button"
             onClick={handleStop}
-            style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
+            style={{ fontSize: "15px", padding: "6px 14px", minHeight: "36px", flexShrink: 0 }}
           >
             {confirming ? "Really?" : "Stop (esc)"}
           </button>
@@ -148,7 +148,7 @@ export function StatusBar({
           <button
             className="button"
             onClick={onNewChat}
-            style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
+            style={{ fontSize: "15px", padding: "6px 14px", minHeight: "36px", flexShrink: 0 }}
           >
             New Chat (esc)
           </button>

@@ -36,11 +36,11 @@ export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
       <div style={{ fontSize: "32px" }} className="hourglass-spin">
         &#9203;
       </div>
-      <div style={{ fontSize: "14px", fontWeight: "bold", color: "#333" }}>
+      <div style={{ fontSize: "16px", fontWeight: "bold", color: "#333" }}>
         Looking for someone to chat with...
       </div>
       {position > 0 && (
-        <div style={{ fontSize: "11px", color: "#666" }}>
+        <div style={{ fontSize: "14px", color: "#666" }}>
           Position in queue: {position}
         </div>
       )}
