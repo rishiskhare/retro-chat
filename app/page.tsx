@@ -1,15 +1,17 @@
 "use client";
 
 import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/context/ThemeContext";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 
 export default function Home() {
   const { theme } = useTheme();
+  const router = useRouter();
 
   const handleStart = useCallback(() => {
-    window.location.href = "/chat";
-  }, []);
+    router.push("/chat");
+  }, [router]);
 
   if (theme === "modern") {
     return (

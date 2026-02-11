@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useTheme } from "@/app/context/ThemeContext";
 
 interface InputAreaProps {
@@ -11,11 +11,26 @@ interface InputAreaProps {
   rateLimited: boolean;
 }
 
+const MAX_INPUT_HEIGHT = 120;
+
+function autoResize(el: HTMLTextAreaElement | null) {
+  if (!el) return;
+  el.style.height = "auto";
+  const next = Math.min(el.scrollHeight, MAX_INPUT_HEIGHT);
+  el.style.height = `${next}px`;
+  el.style.overflowY = el.scrollHeight > MAX_INPUT_HEIGHT ? "auto" : "hidden";
+}
+
 export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimited }: InputAreaProps) {
   const { theme } = useTheme();
   const [text, setText] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTyping = useRef(false);
+
+  useEffect(() => {
+    autoResize(textareaRef.current);
+  }, [text]);
 
   const handleTyping = useCallback(() => {
     if (!isTyping.current) {
@@ -50,6 +65,7 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
     return (
       <div className="modern-input-area">
         <textarea
+          ref={textareaRef}
           className="modern-input"
           value={text}
           onChange={(e) => {
@@ -87,8 +103,9 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
   return (
     <div style={{ display: "flex", gap: "4px", padding: "4px", flexShrink: 0 }}>
       <textarea
+        ref={textareaRef}
         className="chat-input"
-        style={{ flex: 1, height: "44px", minWidth: 0 }}
+        style={{ flex: 1, minWidth: 0 }}
         value={text}
         onChange={(e) => {
           setText(e.target.value);
@@ -100,13 +117,14 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
         maxLength={500}
         autoComplete="off"
         autoCorrect="on"
+        rows={1}
       />
       <button
         className="button"
         onClick={handleSend}
         disabled={disabled || !text.trim()}
         style={{
-          alignSelf: "stretch",
+          alignSelf: "flex-end",
           padding: "0 20px",
           minHeight: "44px",
           flexShrink: 0,
