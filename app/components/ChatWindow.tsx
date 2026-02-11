@@ -2,12 +2,15 @@
 
 import { useEffect, useCallback } from "react";
 import { useChat } from "@/app/hooks/useChat";
+import { useTheme } from "@/app/context/ThemeContext";
 import { MessageArea } from "./MessageArea";
 import { InputArea } from "./InputArea";
 import { StatusBar } from "./StatusBar";
 import { WaitingScreen } from "./WaitingScreen";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function ChatWindow() {
+  const { theme } = useTheme();
   const {
     chatState,
     messages,
@@ -43,6 +46,40 @@ export function ChatWindow() {
     disconnectChat();
     window.location.href = "/";
   }, [disconnectChat]);
+
+  if (theme === "modern") {
+    return (
+      <div className="modern-chat-container">
+        <div className="modern-header">
+          <span className="modern-header-title">RetroChat</span>
+          <ThemeToggle />
+        </div>
+        <div className="modern-chat-body">
+          {chatState === "waiting" ? (
+            <WaitingScreen position={waitingPosition} onCancel={handleDisconnect} />
+          ) : (
+            <>
+              <MessageArea messages={messages} strangerTyping={strangerTyping} />
+              <InputArea
+                onSend={sendMessage}
+                onTyping={sendTyping}
+                onStopTyping={sendStopTyping}
+                disabled={chatState !== "chatting"}
+                rateLimited={rateLimited}
+              />
+            </>
+          )}
+        </div>
+        <StatusBar
+          chatState={chatState}
+          connectionState={connectionState}
+          strangerTyping={strangerTyping}
+          onNewChat={newChat}
+          onDisconnect={handleDisconnect}
+        />
+      </div>
+    );
+  }
 
   return (
     <div

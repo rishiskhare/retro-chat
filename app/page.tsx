@@ -1,11 +1,49 @@
 "use client";
 
 import { useCallback } from "react";
+import { useTheme } from "@/app/context/ThemeContext";
+import { ThemeToggle } from "@/app/components/ThemeToggle";
 
 export default function Home() {
+  const { theme } = useTheme();
+
   const handleStart = useCallback(() => {
     window.location.href = "/chat";
   }, []);
+
+  if (theme === "modern") {
+    return (
+      <div className="modern-welcome-page">
+        <div className="modern-welcome-card">
+          <div className="modern-welcome-header">
+            <ThemeToggle />
+          </div>
+          <div className="modern-welcome-body">
+            <div style={{ fontSize: "48px", marginBottom: "8px" }}>💬</div>
+            <h1 className="modern-welcome-title">RetroChat</h1>
+            <p className="modern-welcome-subtitle">Talk to random strangers!</p>
+            <p className="modern-welcome-desc">Anonymous. Instant. Fun.</p>
+
+            <div className="modern-welcome-notice">
+              <p>
+                You will be randomly paired with a stranger for a 1-on-1 chat.
+                <br />
+                Be respectful. You can skip to a new stranger at any time.
+              </p>
+            </div>
+
+            <button className="modern-btn-primary" onClick={handleStart}>
+              Start Chatting
+            </button>
+
+            <div className="modern-welcome-footer">
+              No registration required &bull; Free &bull; Anonymous
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -62,6 +100,10 @@ export default function Home() {
 
           <div style={{ marginTop: "20px", fontSize: "11px", color: "#999" }}>
             No registration required &bull; Free &bull; Anonymous
+          </div>
+
+          <div style={{ marginTop: "16px" }}>
+            <ThemeToggle />
           </div>
         </div>
       </div>

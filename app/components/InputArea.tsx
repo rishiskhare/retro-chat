@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import { useTheme } from "@/app/context/ThemeContext";
 
 interface InputAreaProps {
   onSend: (text: string) => void;
@@ -11,6 +12,7 @@ interface InputAreaProps {
 }
 
 export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimited }: InputAreaProps) {
+  const { theme } = useTheme();
   const [text, setText] = useState("");
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTyping = useRef(false);
@@ -43,6 +45,44 @@ export function InputArea({ onSend, onTyping, onStopTyping, disabled, rateLimite
       handleSend();
     }
   };
+
+  if (theme === "modern") {
+    return (
+      <div className="modern-input-area">
+        <textarea
+          className="modern-input"
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            handleTyping();
+          }}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          placeholder={disabled ? "Chat ended" : "Message"}
+          maxLength={500}
+          autoComplete="off"
+          autoCorrect="on"
+          rows={1}
+        />
+        <button
+          className="modern-send-btn"
+          onClick={handleSend}
+          disabled={disabled || !text.trim()}
+          aria-label="Send"
+        >
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: "block" }}>
+            <circle cx="14" cy="14" r="14" fill={disabled || !text.trim() ? "#C7C7CC" : "#007AFF"} />
+            <path d="M14 20V10M14 10L9.5 14.5M14 10L18.5 14.5" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {rateLimited && (
+          <span className="rate-limit-warning" style={{ alignSelf: "center", flexShrink: 0 }}>
+            Slow down!
+          </span>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", gap: "4px", padding: "4px", flexShrink: 0 }}>

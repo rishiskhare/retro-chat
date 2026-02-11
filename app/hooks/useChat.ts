@@ -16,6 +16,7 @@ export interface ChatMessage {
 
 export function useChat() {
   const [chatState, setChatState] = useState<ChatState>("idle");
+  const chatStateRef = useRef<ChatState>("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [strangerTyping, setStrangerTyping] = useState(false);
   const [rateLimited, setRateLimited] = useState(false);
@@ -37,6 +38,7 @@ export function useChat() {
       switch (msg.type) {
         case "waiting":
           setWaitingPosition(msg.position);
+          chatStateRef.current = "waiting";
           setChatState("waiting");
           break;
 
@@ -83,6 +85,8 @@ export function useChat() {
           break;
 
         case "stranger-disconnected":
+          if (chatStateRef.current === "stranger-left") break;
+          chatStateRef.current = "stranger-left";
           setChatState("stranger-left");
           setStrangerTyping(false);
           addMessage({
@@ -134,6 +138,7 @@ export function useChat() {
     setMessages([]);
     setStrangerTyping(false);
     setRateLimited(false);
+    chatStateRef.current = "waiting";
     setChatState("waiting");
     pendingRoomId.current = null;
 
@@ -150,6 +155,7 @@ export function useChat() {
     pendingRoomId.current = null;
 
     connectToRoom(roomId);
+    chatStateRef.current = "chatting";
     setChatState("chatting");
     setMessages([]);
     addMessage({
@@ -179,8 +185,9 @@ export function useChat() {
         text: text.trim(),
         ts: Date.now(),
       });
+      play("send");
     },
-    [chatState, send, addMessage]
+    [chatState, send, addMessage, play]
   );
 
   const sendTyping = useCallback(() => {
@@ -204,6 +211,7 @@ export function useChat() {
   const disconnectChat = useCallback(() => {
     send({ type: "disconnect-chat" });
     disconnect();
+    chatStateRef.current = "idle";
     setChatState("idle");
     setMessages([]);
     setStrangerTyping(false);

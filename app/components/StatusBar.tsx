@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import type { ChatState } from "@/app/hooks/useChat";
 import type { ConnectionState } from "@/app/lib/ws";
+import { useTheme } from "@/app/context/ThemeContext";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface StatusBarProps {
   chatState: ChatState;
@@ -19,6 +21,7 @@ export function StatusBar({
   onNewChat,
   onDisconnect,
 }: StatusBarProps) {
+  const { theme } = useTheme();
   const [confirming, setConfirming] = useState(false);
 
   // Reset confirmation state when chat state changes
@@ -28,11 +31,9 @@ export function StatusBar({
 
   const handleStop = useCallback(() => {
     if (confirming) {
-      // Second click — skip to new chat (rejoin queue)
       setConfirming(false);
       onNewChat();
     } else {
-      // First click — ask "Really?"
       setConfirming(true);
     }
   }, [confirming, onNewChat]);
@@ -64,6 +65,39 @@ export function StatusBar({
     statusText = "Searching...";
   } else {
     statusText = "Ready";
+  }
+
+  if (theme === "modern") {
+    return (
+      <div className="modern-status-bar">
+        <div className="modern-status-left">
+          <span
+            className="modern-status-dot"
+            style={{
+              background:
+                connectionState === "connected"
+                  ? "#34C759"
+                  : connectionState === "connecting" || connectionState === "reconnecting"
+                  ? "#FF9500"
+                  : "#FF3B30",
+            }}
+          />
+          <span className="modern-status-text">{statusText}</span>
+        </div>
+        <div className="modern-status-right">
+          {chatState === "chatting" && (
+            <button className="modern-btn-secondary" onClick={handleStop}>
+              {confirming ? "Really?" : "Stop (esc)"}
+            </button>
+          )}
+          {chatState === "stranger-left" && (
+            <button className="modern-btn-primary modern-btn-sm" onClick={onNewChat}>
+              New Chat (esc)
+            </button>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -100,24 +134,27 @@ export function StatusBar({
           {statusText}
         </span>
       </div>
-      {chatState === "chatting" && (
-        <button
-          className="button"
-          onClick={handleStop}
-          style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
-        >
-          {confirming ? "Really?" : "Stop (esc)"}
-        </button>
-      )}
-      {chatState === "stranger-left" && (
-        <button
-          className="button"
-          onClick={onNewChat}
-          style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
-        >
-          New Chat (esc)
-        </button>
-      )}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        {chatState === "chatting" && (
+          <button
+            className="button"
+            onClick={handleStop}
+            style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
+          >
+            {confirming ? "Really?" : "Stop (esc)"}
+          </button>
+        )}
+        {chatState === "stranger-left" && (
+          <button
+            className="button"
+            onClick={onNewChat}
+            style={{ fontSize: "14px", padding: "6px 14px", minHeight: "32px", flexShrink: 0 }}
+          >
+            New Chat (esc)
+          </button>
+        )}
+        <ThemeToggle />
+      </div>
     </div>
   );
 }
