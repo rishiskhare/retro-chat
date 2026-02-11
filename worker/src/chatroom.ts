@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { sendMessage, parseClientMessage, escapeHtml } from "./protocol";
+import { sendMessage, parseClientMessage } from "./protocol";
 import { TokenBucket } from "./ratelimit";
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -81,13 +81,12 @@ export class ChatRoom extends DurableObject {
           return;
         }
 
-        const sanitized = escapeHtml(text);
         // Implicitly clear typing state when a message is sent
         if (state.isTyping) {
           state.isTyping = false;
           sendMessage(partner, { type: "stranger-stop-typing" });
         }
-        sendMessage(partner, { type: "message", text: sanitized, ts: Date.now() });
+        sendMessage(partner, { type: "message", text, ts: Date.now() });
         break;
       }
 
