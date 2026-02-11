@@ -4,6 +4,7 @@ import { TokenBucket } from "./ratelimit";
 
 interface Env {
   CHATROOM: DurableObjectNamespace;
+  MATCHMAKER: DurableObjectNamespace;
 }
 
 interface QueueEntry {
@@ -14,8 +15,21 @@ interface QueueEntry {
 
 export class Matchmaker extends DurableObject<Env> {
   private queue: QueueEntry[] = [];
+  private activeChatUsers = 0;
 
   async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/stats") {
+      return Response.json({ online: this.queue.length + this.activeChatUsers });
+    }
+
+    if (url.pathname === "/room-disconnect" && request.method === "POST") {
+      this.activeChatUsers = Math.max(0, this.activeChatUsers - 1);
+      return new Response("OK", { status: 200 });
+    }
+
+    // Default: WebSocket upgrade for matchmaking
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
 
@@ -125,6 +139,8 @@ export class Matchmaker extends DurableObject<Env> {
         this.queue.unshift(user1);
         continue;
       }
+
+      this.activeChatUsers += 2;
 
       // Close matchmaker connections — clients reconnect to ChatRoom
       try { user1.ws.close(1000, "matched"); } catch {}

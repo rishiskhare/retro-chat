@@ -4,10 +4,12 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/context/ThemeContext";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
+import { useOnlineCount } from "@/app/hooks/useOnlineCount";
 
 export default function Home() {
   const { theme } = useTheme();
   const router = useRouter();
+  const onlineCount = useOnlineCount();
 
   const handleStart = useCallback(() => {
     router.push("/chat");
@@ -37,6 +39,13 @@ export default function Home() {
             <button className="modern-btn-primary" onClick={handleStart}>
               Start Chatting
             </button>
+
+            {onlineCount !== null && (
+              <div style={{ marginTop: "12px", fontSize: "14px", color: "#6b7280", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
+                {onlineCount} {onlineCount === 1 ? "user" : "users"} online
+              </div>
+            )}
 
             <div className="modern-welcome-footer">
               No registration required &bull; Free &bull; Anonymous
@@ -94,6 +103,13 @@ export default function Home() {
           >
             Start Chatting
           </button>
+
+          {onlineCount !== null && (
+            <div style={{ marginTop: "12px", fontSize: "14px", color: "#666", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+              <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
+              {onlineCount} {onlineCount === 1 ? "user" : "users"} online
+            </div>
+          )}
 
           <div style={{ marginTop: "20px", fontSize: "13px", color: "#999" }}>
             No registration required &bull; Free &bull; Anonymous

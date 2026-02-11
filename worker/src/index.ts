@@ -27,6 +27,15 @@ export default {
       return new Response("Forbidden origin", { status: 403 });
     }
 
+    // REST route: /api/stats
+    if (url.pathname === "/api/stats" && request.method === "GET") {
+      const matchmakerId = env.MATCHMAKER.idFromName("global-matchmaker");
+      const matchmaker = env.MATCHMAKER.get(matchmakerId);
+      const stats = await matchmaker.fetch(new Request("http://do/stats"));
+      const data = await stats.json();
+      return Response.json(data, { headers: corsHeaders(matchedOrigin) });
+    }
+
     // WebSocket routes
     if (request.headers.get("Upgrade") !== "websocket") {
       return new Response("Expected WebSocket", { status: 426 });

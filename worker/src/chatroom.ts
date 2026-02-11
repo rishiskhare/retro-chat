@@ -12,8 +12,13 @@ interface SocketState {
   isTyping: boolean;
 }
 
-export class ChatRoom extends DurableObject {
+interface Env {
+  MATCHMAKER: DurableObjectNamespace;
+}
+
+export class ChatRoom extends DurableObject<Env> {
   private socketStates: Map<WebSocket, SocketState> = new Map();
+  private notifiedSockets = new Set<WebSocket>();
 
   async fetch(request: Request): Promise<Response> {
     const pair = new WebSocketPair();
@@ -117,6 +122,7 @@ export class ChatRoom extends DurableObject {
       case "disconnect-chat":
       case "new-chat": {
         this.notifyPartnerDisconnected(ws);
+        this.notifyMatchmakerDisconnect(ws);
         ws.close(1000, msg.type === "new-chat" ? "new-chat" : "user-disconnect");
         this.socketStates.delete(ws);
         break;
@@ -126,11 +132,13 @@ export class ChatRoom extends DurableObject {
 
   async webSocketClose(ws: WebSocket): Promise<void> {
     this.notifyPartnerDisconnected(ws);
+    this.notifyMatchmakerDisconnect(ws);
     this.socketStates.delete(ws);
   }
 
   async webSocketError(ws: WebSocket): Promise<void> {
     this.notifyPartnerDisconnected(ws);
+    this.notifyMatchmakerDisconnect(ws);
     this.socketStates.delete(ws);
   }
 
@@ -140,6 +148,14 @@ export class ChatRoom extends DurableObject {
       if (s !== ws) return s;
     }
     return null;
+  }
+
+  private notifyMatchmakerDisconnect(ws: WebSocket): void {
+    if (this.notifiedSockets.has(ws)) return;
+    this.notifiedSockets.add(ws);
+    const id = this.env.MATCHMAKER.idFromName("global-matchmaker");
+    const matchmaker = this.env.MATCHMAKER.get(id);
+    matchmaker.fetch("http://do/room-disconnect", { method: "POST" }).catch(() => {});
   }
 
   private notifyPartnerDisconnected(ws: WebSocket): void {

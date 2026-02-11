@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "@/app/context/ThemeContext";
+import { useOnlineCount } from "@/app/hooks/useOnlineCount";
 
 interface WaitingScreenProps {
   position: number;
@@ -9,6 +10,14 @@ interface WaitingScreenProps {
 
 export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
   const { theme } = useTheme();
+  const onlineCount = useOnlineCount();
+
+  const onlineIndicator = onlineCount !== null ? (
+    <div style={{ fontSize: "13px", color: theme === "modern" ? "#6b7280" : "#666", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "4px" }}>
+      <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
+      {onlineCount} {onlineCount === 1 ? "user" : "users"} online
+    </div>
+  ) : null;
 
   if (theme === "modern") {
     return (
@@ -24,6 +33,7 @@ export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
             Position in queue: {position}
           </div>
         )}
+        {onlineIndicator}
         <button className="modern-btn-secondary" onClick={onCancel} style={{ marginTop: "8px" }}>
           Cancel
         </button>
@@ -44,6 +54,7 @@ export function WaitingScreen({ position, onCancel }: WaitingScreenProps) {
           Position in queue: {position}
         </div>
       )}
+      {onlineIndicator}
       <button className="button" onClick={onCancel} style={{ marginTop: "8px" }}>
         Cancel
       </button>
