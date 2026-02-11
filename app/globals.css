@@ -564,6 +564,7 @@ html, body {
 
 .modern-bubble {
   max-width: 255px;
+  width: fit-content;
   padding: 6px 12px;
   border-radius: 18px;
   font-size: 16px;
