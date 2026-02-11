@@ -48,7 +48,7 @@ export function MessageArea({ messages, strangerTyping }: MessageAreaProps) {
         <MessageBubble key={msg.id} message={msg} />
       ))}
       {strangerTyping && (
-        <div style={{ padding: "2px 8px", color: "#808080", fontSize: "16px" }}>
+        <div style={{ padding: "2px 8px", color: "#666", fontSize: "16px" }}>
           <span className="sender-stranger">Stranger</span>{" "}
           <span>is typing</span>
           <span className="typing-dot">.</span>

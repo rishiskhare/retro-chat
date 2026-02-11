@@ -41,7 +41,7 @@ export default function Home() {
             </button>
 
             {onlineCount !== null && (
-              <div style={{ marginTop: "12px", fontSize: "14px", color: "#6b7280", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+              <div style={{ marginTop: "12px", fontSize: "14px", color: "#636366", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
                 <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
                 {onlineCount} {onlineCount === 1 ? "user" : "users"} online
               </div>
@@ -107,7 +107,7 @@ export default function Home() {
             </div>
           )}
 
-          <div style={{ marginTop: "20px", fontSize: "13px", color: "#555" }}>
+          <div style={{ marginTop: "20px", fontSize: "13px", color: "#666" }}>
             No registration required &bull; Free &bull; Anonymous
           </div>
           <div style={{ marginTop: "16px" }}>
